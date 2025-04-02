@@ -1,8 +1,26 @@
 from django.shortcuts import render
+from django.views import View
+from .models import Customer, Product, Cart, OrderPlaced
 
 # Create your views here.
-def home(request):
-    return render(request, 'home.html', {})
+'''def home(request):
+    return render(request, 'home.html', {})'''
+
+'''def product_details(request):
+    return render(request, 'product_details.html', {})'''
+
+
+class ProductView(View):
+    def get(self, request):
+        topwear = Product.objects.filter(category="TW")
+        bottomwear = Product.objects.filter(category="BW")
+
+        return render(request, 'home.html', {'topwear':topwear, 'bottomwear':bottomwear})
+    
+class ProductDetailsView(View):
+    def get(self, request, pk):
+        product = Product.objects.get(pk=pk)
+        return render(request, 'product_details.html', {'product':product})
 
 def mobile(request):
     return render(request, 'mobile.html', {})
@@ -39,9 +57,6 @@ def login(request):
 
 def registration(request):
     return render(request, 'registration.html', {})
-
-def product_details(request):
-    return render(request, 'product_details.html', {})
 
 def buy(request):
     return render(request, 'buy.html', {})
