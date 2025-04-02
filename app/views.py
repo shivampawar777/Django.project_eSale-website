@@ -1,15 +1,11 @@
 from django.shortcuts import render
 from django.views import View
 from .models import Customer, Product, Cart, OrderPlaced
+from .forms import CustomerRegistrationForm
+from django.contrib import messages
 
 # Create your views here.
-'''def home(request):
-    return render(request, 'home.html', {})'''
-
-'''def product_details(request):
-    return render(request, 'product_details.html', {})'''
-
-
+#(1)Home page view
 class ProductView(View):
     def get(self, request):
         topwear = Product.objects.filter(category="TW")
@@ -17,13 +13,43 @@ class ProductView(View):
 
         return render(request, 'home.html', {'topwear':topwear, 'bottomwear':bottomwear})
     
+#(2)This is shows product details
 class ProductDetailsView(View):
     def get(self, request, pk):
         product = Product.objects.get(pk=pk)
         return render(request, 'product_details.html', {'product':product})
 
-def mobile(request):
-    return render(request, 'mobile.html', {})
+#(3)This view shows mobiles according to search
+def mobile(request, data=None):
+    if data == None:
+        mobiles = Product.objects.filter(category="M")
+    elif data == 'Redmi' or data == 'Samsung':
+        mobiles = Product.objects.filter(category="M").filter(brand=data)
+    elif data == 'below':
+        mobiles = Product.objects.filter(category="M").filter(discounted_price__lt=10000)
+    elif data == 'above':
+        mobiles = Product.objects.filter(category="M").filter(discounted_price__gt=10000)
+
+    return render(request, 'mobile.html', {'mobiles':mobiles})
+
+#(4)This is customer registration view
+class CustomerRegistrationView(View):
+    def get(self, request):
+        form = CustomerRegistrationForm()
+        return render(request, 'registration.html', {'form': form})
+    
+    def post(self, request):
+        form = CustomerRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,'Congratulations! User registered successfully.')
+        
+        form = CustomerRegistrationForm()
+        return render(request, 'registration.html', {'form':form})
+
+
+def login(request):
+    return render(request, 'login.html', {})
 
 def laptop(request):
     return render(request, 'laptop.html', {})
@@ -51,12 +77,6 @@ def logout(request):
 
 def add_to_cart(request):
     return render(request, 'cart.html', {})
-
-def login(request):
-    return render(request, 'login.html', {})
-
-def registration(request):
-    return render(request, 'registration.html', {})
 
 def buy(request):
     return render(request, 'buy.html', {})
