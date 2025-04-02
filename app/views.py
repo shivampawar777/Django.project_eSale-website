@@ -48,9 +48,6 @@ class CustomerRegistrationView(View):
         return render(request, 'registration.html', {'form':form})
 
 
-def login(request):
-    return render(request, 'login.html', {})
-
 def laptop(request):
     return render(request, 'laptop.html', {})
 
