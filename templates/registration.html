@@ -9,7 +9,7 @@
     <div class="col-sm-6 offset-sm-3">
         <h4>Customer Registration</h4>
         <hr>
-        <form action=" " method="POST" novalidate class="shadow p-5">
+        <form action="" method="POST" novalidate class="shadow p-5">
             {% if messages %}
                 {% for message in messages %}
                     <p {% if message.tags %} class="alert alert-{{message.tags}} mb-3" {% endif %}>{{message}}</p>
@@ -19,13 +19,13 @@
             {% csrf_token %}
             {% for fm in form %}
                 <div class="form-group mb-3">
-                    {{fm.label_tag}} {{fm}}<small class="text-danger">{{fm.errors|striptags}}</small>
+                    {{fm.label_tag}} {{fm}} <small class="text-danger">{{fm.errors|striptags}}</small>
                 </div>
             {% endfor %}
             <input type="submit" value="Submit" class="btn btn-primary">
             <br>
             <div class="text-center text-primary fw-bold">
-                <small>Existing User ? <a href="/accounts/login/" class="text-danger">Login Now</a></small>
+                <small>Existing User? <a href="/accounts/login/" class="text-danger">Login Now</a></small>
             </div>
             {% if form.non_field_errors %}
                 {% for error in form.non_field_errors %}

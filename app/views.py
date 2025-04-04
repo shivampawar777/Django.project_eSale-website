@@ -4,6 +4,7 @@ from .models import Customer, Product, Cart, OrderPlaced
 from .forms import CustomerRegistrationForm
 from django.contrib import messages
 
+
 # Create your views here.
 #(1)Home page view
 class ProductView(View):
@@ -44,9 +45,18 @@ class CustomerRegistrationView(View):
             form.save()
             messages.success(request,'Congratulations! User registered successfully.')
         
-        form = CustomerRegistrationForm()
+        #form = CustomerRegistrationForm()
         return render(request, 'registration.html', {'form':form})
 
+
+def address(request):
+    return render(request, 'address.html', {})
+
+def profile(request):
+    return render(request, 'profile.html', {})
+
+def orders(request):
+    return render(request, 'orders.html', {})
 
 def laptop(request):
     return render(request, 'laptop.html', {})
@@ -56,21 +66,6 @@ def topwear(request):
 
 def bottomwear(request):
     return render(request, 'bottomwear.html', {})
-
-def profile(request):
-    return render(request, 'profile.html', {})
-
-def address(request):
-    return render(request, 'address.html', {})
-
-def orders(request):
-    return render(request, 'orders.html', {})
-
-def changepassword(request):
-    return render(request, 'changepassword.html', {})
-
-def logout(request):
-    return render(request, 'logout.html', {})
 
 def add_to_cart(request):
     return render(request, 'cart.html', {})
