@@ -78,7 +78,6 @@ class ProfileView(View):
 #(6)This is customer address view
 def address(request):
     cust_address = Customer.objects.filter(user=request.user)
-    cust_address.delete()
     return render(request, 'address.html', {'cust_address':cust_address, 'active':'btn-primary'})
 
 
