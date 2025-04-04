@@ -6,37 +6,29 @@
 {% block main-content %}
 <div class="container my-5">
 <div class="row">
-    <h3>Welcome Sonam</h3>
+    <h5>Welcome {{request.user}}</h5>
     <div class="col-sm-2 border-end">
         <ul class="list-unstyled">
-            <li class="d-grid"><a href="/profile/" class="btn btn-primary">Profile</a></li>
-            <li class="d-grid"><a href="/address/" class="btn">Address</a></li>
+            <li class="d-grid"><a href="/profile/" class="btn">Profile</a></li>
+            <li class="d-grid"><a href="/address/" class="btn {{active}}">Address</a></li>
         </ul>
     </div>
     <div class="col-sm-9 offset-sm-1">
     <div class="row">
-        <div class="col-sm-6">
+        {% for add in cust_address %}
+            <div class="col-sm-6">
             <div class="card">
             <div class="card-body">
-                <h3>Address 1</h3>
-                    <p>Name: Sakshi Agrawal</p>
-                    <p>Address 1: Lalpur</p>
-                    <p>Address 2: Ranchi</p>
-                    <p>State: Jharkhand</p>
+                <h4>Address {{ forloop.counter }}</h4>
+                <p>Name: {{add.name}}</p>
+                <p>Locality: {{add.locality}}</p>
+                <p>City : {{add.city}}</p>
+                <p>Zipcode: {{add.zipcode}}</p>
+                <p>State: {{add.state}}</p>
             </div>
             </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="card">
-            <div class="card-body">
-                <h3>Address 2</h3>
-                <p>Name: Rohit Kumar</p>
-                <p>Address 1: Lalpur</p>
-                <p>Address 2: Ranchi</p>
-                <p>State: Jharkhand</p>
             </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
     </div>
 </div>

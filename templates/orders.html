@@ -6,7 +6,7 @@
 {% block main-content %}
 <div class="container my-5">
 <div class="row">
-    <h3>Welcome Sakshi</h3>
+    <h5>Welcome {{request.user}}</h5>
     <div class="col-sm-2 border-end">
         <ul class="list-unstyled">
             <li class="d-grid"><a href="/orders/" class="btn btn-primary">Orders</a></li>

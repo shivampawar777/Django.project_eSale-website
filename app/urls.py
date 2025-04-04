@@ -14,7 +14,7 @@ urlpatterns = [
     path('mobile/<slug:data>', mobile),
     
     path('registration/', CustomerRegistrationView.as_view()),
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=LoginForm)),
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=LoginForm), name="login"),
 
     path('logout/', auth_views.LogoutView.as_view()),
 
@@ -26,11 +26,15 @@ urlpatterns = [
     path('password-reset-confirm/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html', form_class=PasswordResetConfirmForm), name="password_reset_confirm"),
     path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name="password_reset_complete"),
 
+
+    path('profile/', ProfileView.as_view()),
+
+    path('address/', address),
+
+
     path('laptop/', laptop),
     path('topwear/', topwear),
     path('bottomwear/', bottomwear),
-    path('profile/', profile),
-    path('address/', address),
     path('orders/', orders),
     path('add-to-cart/', add_to_cart),
     path('buy/', buy),
