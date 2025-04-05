@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from .models import Customer, Product, Cart, OrderPlaced
 from .forms import CustomerRegistrationForm, CustomerProfileForm
+from django.contrib.auth import logout
 from django.contrib import messages
-from app.models import Customer
 
 
 # Create your views here.
@@ -49,12 +49,16 @@ class CustomerRegistrationView(View):
         #form = CustomerRegistrationForm()
         return render(request, 'registration.html', {'form':form})
 
+#(5)This view is to logout current user
+def logout_view(request):
+    logout(request)
+    return redirect('/accounts/login')
 
-#(5)This is customer profile view
+#(6)This is customer profile view
 class ProfileView(View):
     def get(self, request):
         form = CustomerProfileForm()
-        return render(request, 'profile.html', {'form':form, 'active':'btn-primary'})
+        return render(request, 'profile.html', {'form':form})
     
     def post(self, request):
         form = CustomerProfileForm(request.POST)
@@ -71,15 +75,35 @@ class ProfileView(View):
             messages.success(request, "Profile updated successfully!")
 
         form = CustomerProfileForm()
-        return render(request, 'profile.html', {'form':form, 'active': 'btn-primary'})
+        return render(request, 'profile.html', {'form':form})
                                                     
-
-
-#(6)This is customer address view
+#(7)This is customer address view
 def address(request):
     cust_address = Customer.objects.filter(user=request.user)
-    cust_address.delete()
-    return render(request, 'address.html', {'cust_address':cust_address, 'active':'btn-primary'})
+    return render(request, 'address.html', {'cust_address':cust_address})
+
+
+#(8)This view to add product to the cart.
+def add_to_cart(request):
+    usr = request.user
+    pid = request.GET.get('prod_id')
+    product_id = Product.objects.get(id=pid)
+    Cart(user=usr, product=product_id).save()
+    messages.success(request, "Product added to the cart")
+    
+    return redirect('/show-cart/')
+
+
+#(9)This is customer address view
+def show_cart(request):
+    if request.user.is_authenticated:
+        usr = request.user
+        cart = Cart.objects.filter(user=usr)
+
+    return render(request, 'show_cart.html', {'cart': cart})
+    
+
+
 
 
 
@@ -95,11 +119,11 @@ def topwear(request):
 def bottomwear(request):
     return render(request, 'bottomwear.html', {})
 
-def add_to_cart(request):
-    return render(request, 'cart.html', {})
-
 def buy(request):
     return render(request, 'buy.html', {})
 
 def checkout(request):
     return render(request, 'checkout.html', {})
+
+
+
