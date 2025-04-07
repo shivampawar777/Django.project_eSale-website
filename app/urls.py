@@ -7,7 +7,7 @@ from .forms import LoginForm, ChangePasswordForm, Password_Reset_Form, PasswordR
 
 
 urlpatterns = [
-    path('home/', ProductView.as_view()),
+    path('home/', Home_Page.as_view()),
     path('product-details/<int:pk>/', ProductDetailsView.as_view()),
     
     path('mobile/', mobile),
@@ -29,21 +29,18 @@ urlpatterns = [
     path('profile/', ProfileView.as_view()),
     path('address/', address),
 
-
-
     path('add-to-cart/', add_to_cart),
     path('show-cart/', show_cart),
 
+    path('plus-cart/', plus_cart),
+    path('minus-cart/', minus_cart),
+    path('remove-cart/', remove_cart),
 
-
-
-
-    path('laptop/', laptop),
-    path('topwear/', topwear),
-    path('bottomwear/', bottomwear),
-    path('orders/', orders),
-    path('buy/', buy),
     path('checkout/', checkout),
+    path('payment-done/', payment_done),
+    path('orders/', orders),
+    
+    path('buy/', buy),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -1,14 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.views import View
 from .models import Customer, Product, Cart, OrderPlaced
 from .forms import CustomerRegistrationForm, CustomerProfileForm
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.http import JsonResponse
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 # Create your views here.
 #(1)Home page view
-class ProductView(View):
+class Home_Page(View):
     def get(self, request):
         topwear = Product.objects.filter(category="TW")
         bottomwear = Product.objects.filter(category="BW")
@@ -55,6 +59,7 @@ def logout_view(request):
     return redirect('/accounts/login')
 
 #(6)This is customer profile view
+@method_decorator(login_required, name='dispatch')
 class ProfileView(View):
     def get(self, request):
         form = CustomerProfileForm()
@@ -78,12 +83,13 @@ class ProfileView(View):
         return render(request, 'profile.html', {'form':form})
                                                     
 #(7)This is customer address view
+@login_required
 def address(request):
     cust_address = Customer.objects.filter(user=request.user)
     return render(request, 'address.html', {'cust_address':cust_address})
 
-
 #(8)This view to add product to the cart.
+@login_required
 def add_to_cart(request):
     usr = request.user
     pid = request.GET.get('prod_id')
@@ -93,37 +99,133 @@ def add_to_cart(request):
     
     return redirect('/show-cart/')
 
-
 #(9)This is customer address view
+@login_required
 def show_cart(request):
     if request.user.is_authenticated:
         usr = request.user
         cart = Cart.objects.filter(user=usr)
 
-    return render(request, 'show_cart.html', {'cart': cart})
-    
+        amount=0.0
+        shipping_charges=50.0
+        total_amount=0.0
+        cart_products=[p for p in Cart.objects.all() if p.user == request.user]
+        
+        if cart_products:
+            for p in cart_products:
+                tempamount = (p.quantity * p.product.discounted_price)
+                amount += tempamount
+                total_amount = amount + shipping_charges
+
+            return render(request, 'show_cart.html', {'cart': cart, 'amount':amount,'shipping_charges':shipping_charges, 'total_amount':total_amount})
+        else:
+            return render(request, 'empty_cart.html')
+
+#(10)This is customer address view
+def plus_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.quantity +=1
+        c.save()
+
+        amount=0.0
+        shipping_charges=50.0
+        cart_products = [p for p in Cart.objects.all() if p.user == request.user]
+        for p in cart_products:
+            tempamount = (p.quantity * p.product.discounted_price)
+            amount += tempamount
+
+        data = {'quantity':c.quantity, 'amount':amount, 'total_amount': amount+shipping_charges}
+        return JsonResponse(data)
+    else:
+        return HttpResponse("")
+
+#(11)This is customer address view
+def minus_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.quantity-=1
+        c.save()
+
+        amount=0.0
+        shipping_charges=50.0
+        cart_product = [p for p in Cart.objects.all() if p.user == request.user]
+        for p in cart_product:
+            tempamount = (p.quantity * p.product.discounted_price)
+            amount += tempamount
+
+        data = {'quantity':c.quantity, 'amount':amount, 'total_amount':amount+shipping_charges}
+        return JsonResponse(data)
+    else:
+        return HttpResponse("")
+
+#(12)This is customer address view
+def remove_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.delete()
+        
+        amount=0.0
+        shipping_charges=50.0
+        cart_product = [p for p in Cart.objects.all() if p.user == request.user]
+        for p in cart_product:
+            tempamount = (p.quantity * p.product.discounted_price)
+            amount += tempamount
+
+        data = {'amount':amount, 'total_amount':amount+shipping_charges}
+        return JsonResponse(data)
+    else:
+        return HttpResponse("")
 
 
+#(13)This is checkout view
+@login_required
+def checkout(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+    cust_address = Customer.objects.filter(user=user)
 
+    amount = 0.0
+    shipping_amount = 50.0
+    totalamount=0.0
+    cart_product = [p for p in Cart.objects.all() if p.user == request.user]
+    if cart_product:
+        for p in cart_product:
+            tempamount = (p.quantity * p.product.discounted_price)
+            amount += tempamount
+        
+        total_amount = amount+shipping_amount
 
+    return render(request, 'checkout.html', {'cart_items':cart_items, 'cust_address':cust_address, 'total_amount':total_amount})
 
+#(14)This is payment_done view
+@login_required
+def payment_done(request):
+    cust_id = request.GET.get['custid']
+    user = request.user
+    customer = Customer.objects.get(id=cust_id)
+    cart_id = Cart.objects.filter(user=user)
+
+    for id in cart_id:
+        OrderPlaced(user=user, customer=customer, product=id.product, quantity=id.quantity).save()
+        id.delete()
+
+    return redirect('/orders/')
+
+#(15)This is orders view
+@login_required
 def orders(request):
-    return render(request, 'orders.html', {})
+    order_placed = OrderPlaced.object.get(user=request.user)
 
-def laptop(request):
-    return render(request, 'laptop.html', {})
+    return render(request, 'orders.html', {'order_placed':order_placed})
 
-def topwear(request):
-    return render(request, 'topwear.html', {})
 
-def bottomwear(request):
-    return render(request, 'bottomwear.html', {})
 
 def buy(request):
     return render(request, 'buy.html', {})
-
-def checkout(request):
-    return render(request, 'checkout.html', {})
 
 
 
