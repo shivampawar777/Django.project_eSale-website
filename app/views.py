@@ -92,7 +92,7 @@ def address(request):
 @login_required
 def add_to_cart(request):
     usr = request.user
-    pid = request.GET.get('prod_id')
+    pid = request.GET.get('prod_id1')
     product_id = Product.objects.get(id=pid)
     Cart(user=usr, product=product_id).save()
     messages.success(request, "Product added to the cart")
@@ -204,7 +204,7 @@ def checkout(request):
 #(14)This is payment_done view
 @login_required
 def payment_done(request):
-    cust_id = request.GET.get['custid']
+    cust_id = request.GET.get('custid')
     user = request.user
     customer = Customer.objects.get(id=cust_id)
     cart_id = Cart.objects.filter(user=user)
@@ -215,17 +215,24 @@ def payment_done(request):
 
     return redirect('/orders/')
 
+
 #(15)This is orders view
 @login_required
 def orders(request):
-    order_placed = OrderPlaced.object.get(user=request.user)
+    order_placed = OrderPlaced.objects.filter(user=request.user)
 
     return render(request, 'orders.html', {'order_placed':order_placed})
 
 
-
+#(15)This is direct buy view
+@login_required
 def buy(request):
-    return render(request, 'buy.html', {})
+    usr = request.user
+    pid = request.GET.get('prod_id2')
+    product_id = Product.objects.get(id=pid)
+    Cart(user=usr, product=product_id).save()
+    
+    return redirect('/checkout/')
 
 
 

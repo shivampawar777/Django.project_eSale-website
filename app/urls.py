@@ -7,7 +7,7 @@ from .forms import LoginForm, ChangePasswordForm, Password_Reset_Form, PasswordR
 
 
 urlpatterns = [
-    path('home/', Home_Page.as_view()),
+    path('', Home_Page.as_view()),
     path('product-details/<int:pk>/', ProductDetailsView.as_view()),
     
     path('mobile/', mobile),
