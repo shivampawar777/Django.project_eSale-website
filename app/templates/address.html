@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Address {% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+<div class="row">
+    <h5>Welcome {{request.user}}</h5>
+    <div class="col-sm-2 border-end">
+        <ul class="list-unstyled">
+            <li class="d-grid"><a href="/profile/" class="btn">Profile</a></li>
+            <li class="d-grid"><a href="/address/" class="btn btn-primary">Address</a></li>
+        </ul>
+    </div>
+    <div class="col-sm-9 offset-sm-1">
+    <div class="row">
+        {% for add in cust_address %}
+            <div class="col-sm-6">
+            <div class="card">
+            <div class="card-body">
+                <h4>Address {{ forloop.counter }}</h4>
+                <p>Name: {{add.name}}</p>
+                <p>Locality: {{add.locality}}</p>
+                <p>City : {{add.city}}</p>
+                <p>Zipcode: {{add.zipcode}}</p>
+                <p>State: {{add.state}}</p>
+            </div>
+            </div>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+</div>
+</div>
+{% endblock main-content %}

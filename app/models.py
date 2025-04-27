@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+
 # Create your models here.
 STATE_CHOICES = (
   ('Andaman & Nicobar Islands','Andaman & Nicobar Islands'),
@@ -50,8 +51,9 @@ class Customer(models.Model):
   state = models.CharField(choices=STATE_CHOICES, max_length=50)
   
   def __str__(self):
-    #return self.user.username
     return str(self.id)
+
+
 
 CATEGORY_CHOICES = (
  ('M', 'Mobile'),
@@ -72,6 +74,7 @@ class Product(models.Model):
     return str(self.id)
 
 
+
 class Cart(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -84,6 +87,7 @@ class Cart(models.Model):
   @property
   def total_cost(self):
     return self.quantity * self.product.discounted_price
+
 
 
 STATUS_CHOICES = (

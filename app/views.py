@@ -18,12 +18,14 @@ class Home_Page(View):
         bottomwear = Product.objects.filter(category="BW")
 
         return render(request, 'home.html', {'topwear':topwear, 'bottomwear':bottomwear})
+
     
 #(2)This is shows product details
 class ProductDetailsView(View):
     def get(self, request, pk):
         product = Product.objects.get(pk=pk)
         return render(request, 'product_details.html', {'product':product})
+
 
 #(3)This view shows mobiles according to search
 def mobile(request, data=None):
@@ -37,6 +39,7 @@ def mobile(request, data=None):
         mobiles = Product.objects.filter(category="M").filter(discounted_price__gt=10000)
 
     return render(request, 'mobile.html', {'mobiles':mobiles})
+
 
 #(4)This is customer registration view
 class CustomerRegistrationView(View):
@@ -53,10 +56,12 @@ class CustomerRegistrationView(View):
         #form = CustomerRegistrationForm()
         return render(request, 'registration.html', {'form':form})
 
+
 #(5)This view is to logout current user
 def logout_view(request):
     logout(request)
     return redirect('/accounts/login')
+
 
 #(6)This is customer profile view
 @method_decorator(login_required, name='dispatch')
@@ -81,6 +86,7 @@ class ProfileView(View):
 
         form = CustomerProfileForm()
         return render(request, 'profile.html', {'form':form})
+
                                                     
 #(7)This is customer address view
 @login_required
@@ -88,16 +94,18 @@ def address(request):
     cust_address = Customer.objects.filter(user=request.user)
     return render(request, 'address.html', {'cust_address':cust_address})
 
+
 #(8)This view to add product to the cart.
 @login_required
 def add_to_cart(request):
     usr = request.user
-    pid = request.GET.get('prod_id')
+    pid = request.GET.get('prod_id1')
     product_id = Product.objects.get(id=pid)
     Cart(user=usr, product=product_id).save()
     messages.success(request, "Product added to the cart")
     
     return redirect('/show-cart/')
+
 
 #(9)This is customer address view
 @login_required
@@ -121,6 +129,7 @@ def show_cart(request):
         else:
             return render(request, 'empty_cart.html')
 
+
 #(10)This is customer address view
 def plus_cart(request):
     if request.method == 'GET':
@@ -141,6 +150,7 @@ def plus_cart(request):
     else:
         return HttpResponse("")
 
+
 #(11)This is customer address view
 def minus_cart(request):
     if request.method == 'GET':
@@ -160,6 +170,7 @@ def minus_cart(request):
         return JsonResponse(data)
     else:
         return HttpResponse("")
+
 
 #(12)This is customer address view
 def remove_cart(request):
@@ -201,10 +212,11 @@ def checkout(request):
 
     return render(request, 'checkout.html', {'cart_items':cart_items, 'cust_address':cust_address, 'total_amount':total_amount})
 
+
 #(14)This is payment_done view
 @login_required
 def payment_done(request):
-    cust_id = request.GET.get['custid']
+    cust_id = request.GET.get('custid')
     user = request.user
     customer = Customer.objects.get(id=cust_id)
     cart_id = Cart.objects.filter(user=user)
@@ -215,17 +227,24 @@ def payment_done(request):
 
     return redirect('/orders/')
 
+
 #(15)This is orders view
 @login_required
 def orders(request):
-    order_placed = OrderPlaced.object.get(user=request.user)
+    order_placed = OrderPlaced.objects.filter(user=request.user)
 
     return render(request, 'orders.html', {'order_placed':order_placed})
 
 
-
+#(15)This is direct buy view
+@login_required
 def buy(request):
-    return render(request, 'buy.html', {})
+    usr = request.user
+    pid = request.GET.get('prod_id2')
+    product_id = Product.objects.get(id=pid)
+    Cart(user=usr, product=product_id).save()
+    
+    return redirect('/checkout/')
 
 
 
