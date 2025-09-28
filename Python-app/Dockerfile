@@ -1,9 +1,11 @@
-# ___Stage 1: Base build stage___
+# ------------------------------
+# Stage 1: Builder (build dependencies)
+# ------------------------------
 FROM python:3.13-slim AS builder
 
 # Set environment variables to optimize python
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 # Create and set working directory
 WORKDIR /build
@@ -17,7 +19,9 @@ RUN apt-get update && \
 
 
 
-# ___Stage 2: Production stage___
+# ------------------------------
+# Stage 2: Runtime (production)
+# ------------------------------
 FROM python:3.13-slim
 
 #1.copy the Python dependencies from the builder stage
@@ -35,8 +39,13 @@ RUN useradd -m -r appuser && \
 #set working directory for production stage
 WORKDIR /app
 
-#copy source code to container alongwith set ownership & group to non-root user
-COPY --chown=appuser:appuser src /app/
+#copy source code & entrypoint file to container alongwith
+#set ownership & group to non-root user
+COPY --chown=appuser:appuser src/ /app/ && \
+     --chown=appuser:appuser entrypoint.sh /app/
+
+#make entrypoint.sh executable
+RUN chmod +x entrypoint.sh
 
 #switch to non-root user
 USER appuser
@@ -45,5 +54,8 @@ USER appuser
 EXPOSE 8000
 ENV PYTHONUNBUFFERED=1
 
+# Entrypoint handles migrations / collectstatic
+ENTRYPOINT ["entrypoint.sh"]
+
 # Start the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "eSaleproject.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "$(($(nproc)*2+1))", "eSaleproject.wsgi:application"]
